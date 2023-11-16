@@ -73,36 +73,71 @@ public class Maze {
     }
 
     public void generateMazePRIM() {
-        // Randomly choose a cell
-        
-        //resetMaze();
-        Random random = new Random();
-        int r = random.nextInt(rows);
-        int c = random.nextInt(cols);
-        Cell start = cells[r][c];
-         resetMaze();
+    // Initialize the grid
+    resetMaze();
 
-        // Add frontiers
-        addFrontiers(start);
+    // Randomly choose a starting cell
+    Random random = new Random();
+    int r = random.nextInt(rows);
+    int c = random.nextInt(cols);
+    Cell start = cells[r][c];
 
-        while (!frontiers.isEmpty()) {
-            // Pick a random frontier
-            Cell frontier = frontiers.remove(random.nextInt(frontiers.size()));
-            List<Cell> neighbours = getNeighbours(frontier);
+    // Initialize a list of visited cells
+    List<Cell> visitedCells = new ArrayList<>();
+    visitedCells.add(start);
 
-            // Connect the frontier to one of its neighbours
-            Collections.shuffle(neighbours);
-            for (Cell neighbour : neighbours) {
-                if (neighbour.isInMaze()) {
-                    frontier.breakWall(neighbour);
-                    break;
-                }
-            }
+    while (!visitedCells.isEmpty()) {
+        // Pick a random visited cell
+        Cell current = visitedCells.get(random.nextInt(visitedCells.size()));
 
-            // Add new frontiers
-            addFrontiers(frontier);
+        // Get unvisited neighbors
+        List<Cell> unvisitedNeighbors = getUnvisitedNeighbors(current);
+
+        if (!unvisitedNeighbors.isEmpty()) {
+            // Randomly choose one unvisited neighbor
+            Cell neighbor = unvisitedNeighbors.get(random.nextInt(unvisitedNeighbors.size()));
+
+            // Connect the current cell to the chosen neighbor
+            current.breakWall(neighbor);
+
+            // Mark the neighbor as visited and add it to the list
+            neighbor.setVisited(true);
+            visitedCells.add(neighbor);
+        } else {
+            // If there are no unvisited neighbors, remove this cell from the list
+            visitedCells.remove(current);
         }
     }
+}
+   
+   
+    private List<Cell> getUnvisitedNeighbors(Cell cell) {
+    List<Cell> unvisitedNeighbors = new ArrayList<>();
+    int row = cell.getRow();
+    int col = cell.getCol();
+
+    // Check the top neighbor
+    if (row > 0 && !cells[row - 1][col].isVisited()) {
+        unvisitedNeighbors.add(cells[row - 1][col]);
+    }
+
+    // Check the left neighbor
+    if (col > 0 && !cells[row][col - 1].isVisited()) {
+        unvisitedNeighbors.add(cells[row][col - 1]);
+    }
+
+    // Check the bottom neighbor
+    if (row < rows - 1 && !cells[row + 1][col].isVisited()) {
+        unvisitedNeighbors.add(cells[row + 1][col]);
+    }
+
+    // Check the right neighbor
+    if (col < cols - 1 && !cells[row][col + 1].isVisited()) {
+        unvisitedNeighbors.add(cells[row][col + 1]);
+    }
+
+    return unvisitedNeighbors;
+}
 
     private void addFrontiers(Cell cell) {
         cell.setInMaze(true);
