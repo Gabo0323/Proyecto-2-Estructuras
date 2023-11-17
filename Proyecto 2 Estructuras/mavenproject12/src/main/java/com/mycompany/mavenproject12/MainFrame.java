@@ -3,7 +3,6 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.mycompany.mavenproject12;
-
 /**
  *
  * @author esteb
@@ -103,7 +102,22 @@ public class MainFrame extends JFrame {
         this.setVisible(true);
     }
 
-    
+    private void updateMazeInfo() {
+    StringBuilder infoBuilder = new StringBuilder();
+    int contador = 0;
+    for (MazeWindow mazeWindow : openMazes) {
+        Maze maze = mazeWindow.getMaze(); // Asumiendo que tienes un método para obtener el Maze desde MazeWindow
+        int numRows = maze.getRows();
+        int numCols = maze.getCols();
+        
+        infoBuilder.append("Laberinto ").append(contador + 1).append(": ")
+                   .append(numRows).append(" filas x ")
+                   .append(numCols).append(" columnas\n");
+        contador++;
+    }
+    mazeInfoTextArea.setText(infoBuilder.toString());
+    System.out.println("Total de laberintos abiertos: " + contador);
+}
    
     private void updateCellSize() {
         // Actualizar la lógica del tamaño de las celdas si es necesario
@@ -166,17 +180,6 @@ public class MainFrame extends JFrame {
         }
     }
 
-    private void updateMazeInfo() {
-        StringBuilder infoBuilder = new StringBuilder();
-         int contador=0;
-        for (MazeWindow maze : openMazes) {
-           contador+=1;
-            // Aquí agregas la información del laberinto como prefieras.
-            infoBuilder.append("www").append("\n");
-        }
-        mazeInfoTextArea.setText(infoBuilder.toString());
-        System.out.println("contador: "+contador);
-    }
     
     
     
