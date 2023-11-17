@@ -25,6 +25,10 @@ public class MazeWindow extends JFrame {
 
   private JButton zoomInButton;
   private JButton zoomOutButton;
+   public Maze getMaze() {
+        return this.maze;
+    }
+
 
   public MazeWindow(Maze maze) {
 
@@ -35,9 +39,11 @@ public class MazeWindow extends JFrame {
       setTitle("Laberinto");
       setSize(800, 600);
       setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+      
+      
 
       // Crear el botón de guardar y su ActionListener
-      JButton saveButton = new JButton("MAZE WINDOW Guardar Laberinto");
+      JButton saveButton = new JButton("Guardar Laberinto");
       saveButton.addActionListener(new ActionListener() {
           @Override
           public void actionPerformed(ActionEvent e) {
@@ -68,7 +74,18 @@ public class MazeWindow extends JFrame {
               }
           }
       });
+      
+      JButton switchViewButton = new JButton("Switch View");
+        switchViewButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mazePanel.setUsePaintComponent2(!mazePanel.isUsingPaintComponent2());
+                switchViewButton.setText(mazePanel.isUsingPaintComponent2() ? "Use Default View" : "Use Alternative View");
+            }
+        });
 
+        
+        
       // Añadir el botón de navegación al panel de botones
       toggleSolutionButton = new JButton("Show Solution");
       toggleSolutionButton.addActionListener(new ActionListener() {
@@ -86,6 +103,7 @@ public class MazeWindow extends JFrame {
       buttonPanel.add(toggleSolutionButton);
       //buttonPanel.add(navigateMazeButton);
       buttonPanel.add(navigateMazeButton);
+       buttonPanel.add(switchViewButton);
       this.getContentPane().add(buttonPanel, BorderLayout.SOUTH); // Añadir el botón en la parte sur del layout
 
       zoomInButton = new JButton("Zoom In");
