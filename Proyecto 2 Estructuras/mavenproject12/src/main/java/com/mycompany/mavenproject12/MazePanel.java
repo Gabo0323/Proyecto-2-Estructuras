@@ -7,6 +7,7 @@ package com.mycompany.mavenproject12;
 import java.awt.Color;
 import javax.swing.JPanel;
 import java.awt.Graphics;
+import java.awt.event.*;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.util.Stack;
@@ -24,6 +25,7 @@ public class MazePanel extends JPanel {
     private Cell currentCell;
     private boolean navigable = false;
      private boolean usePaintComponent2 = false;
+      private boolean startSelectionMode = false;
 
     private double scale = 1.0;
 
@@ -88,7 +90,11 @@ public class MazePanel extends JPanel {
             // Si la variable showSolution es verdadera, dibuja la solución
             //Stack<Cell> solution = maze.solveMaze();
             maze.resetVisited();
+            
             Stack<Cell> solution = maze.solveMaze();
+            
+            Cell firstCell = solution.peek(); // La primera celda
+                Cell lastCell = solution.lastElement(); // La última celda
             g.setColor(Color.BLACK); // Elige el color para la solución
 
             for (Cell cell : solution) {
@@ -97,9 +103,19 @@ public class MazePanel extends JPanel {
                 int y = cell.getRow() * cellSize + cellSize / 2;
                 int ovalSize = Math.max(1, cellSize / 4); // Ajusta el tamaño del círculo
                 g.fillOval(x - ovalSize / 2, y - ovalSize / 2, ovalSize, ovalSize);
+                
+                 if (cell.equals(firstCell)) {
+                        g.setColor(Color.BLUE); // Color para la primera celda
+                    } else if (cell.equals(lastCell)) {
+                        g.setColor(Color.GREEN); // Color para la última celda
+                    } else {
+                        g.setColor(Color.BLACK); // Color para las demás celdas
+                    }
 
-                System.out.println("x:" + x);
-                System.out.println("y:" + y);
+                    g.fillOval(x - ovalSize / 2, y - ovalSize / 2, ovalSize, ovalSize);
+
+                //System.out.println("x:" + x);
+                //System.out.println("y:" + y);
 
             }
             //Cell start = solution.get(0); // Asumiendo que la solución comienza con la celda inicial.
@@ -342,5 +358,80 @@ public boolean isUsingPaintComponent2() {
         }
         return false; // Las coordenadas están fuera de los límites del laberinto
     }
+    private boolean targetSelectionMode = false;
+
+    public void enableTargetSelection(boolean enable) {
+        this.targetSelectionMode = enable;
+        if (enable) {
+            addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (targetSelectionMode) {
+                        selectTargetCell(e.getX(), e.getY());
+                        targetSelectionMode = false; // Deshabilitar el modo después de la selección
+                    }
+                }
+            });
+        }
+    }
+    
+    public void enableStartSelection(boolean enable) {
+        this.startSelectionMode = enable;
+        if (enable) {
+            addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (startSelectionMode) {
+                        selectStartCell(e.getX(), e.getY());
+                        startSelectionMode = false; // Deshabilitar el modo después de la selección
+                    }
+                }
+            });
+        }
+    }
+    
+    private void selectTargetCell(int x, int y) {
+    // Ajustar las coordenadas del ratón para tener en cuenta la transformación y escala
+    int w = getWidth();
+    int h = getHeight();
+    int adjustedX = (int) ((x - w / 2) / scale + w / 2);
+    int adjustedY = (int) ((y - h / 2) / scale + h / 2);
+
+    // Calcular el tamaño de las celdas basado en el tamaño actual del panel
+    int cellSize = Math.min(getWidth() / maze.getCols(), getHeight() / maze.getRows());
+
+    // Convertir coordenadas de pantalla a coordenadas de celda
+    int col = adjustedX / cellSize;
+    int row = adjustedY / cellSize;
+
+    // Comprobar si las coordenadas están dentro de los límites del laberinto
+    if (row >= 0 && row < maze.getRows() && col >= 0 && col < maze.getCols()) {
+        // Establecer la celda seleccionada como objetivo en Maze
+        maze.setSolutionTarget(row, col);
+        repaint(); // Repintar para mostrar la solución desde la nueva celda objetivo
+    }
+}
+    private void selectStartCell(int x, int y) {
+    // Ajustar las coordenadas del ratón para tener en cuenta la transformación y escala
+    int w = getWidth();
+    int h = getHeight();
+    int adjustedX = (int) ((x - w / 2) / scale + w / 2);
+    int adjustedY = (int) ((y - h / 2) / scale + h / 2);
+
+    // Calcular el tamaño de las celdas basado en el tamaño actual del panel
+    int cellSize = Math.min(getWidth() / maze.getCols(), getHeight() / maze.getRows());
+
+    // Convertir coordenadas de pantalla a coordenadas de celda
+    int col = adjustedX / cellSize;
+    int row = adjustedY / cellSize;
+
+    // Comprobar si las coordenadas están dentro de los límites del laberinto
+    if (row >= 0 && row < maze.getRows() && col >= 0 && col < maze.getCols()) {
+        // Establecer la celda seleccionada como inicio en Maze
+        maze.setStartCell(row, col);
+        repaint(); // Repintar para mostrar cualquier cambio en la pantalla
+    }
+}
 
 }
+
