@@ -37,6 +37,10 @@ public class Maze {
     private final int cols;
     private final Cell[][] cells;
     private final List<Cell> frontiers;
+     private Cell solutionTarget;
+      private Cell startCell;
+     
+
     
     public int getCols() {
         return cols;
@@ -48,6 +52,13 @@ public class Maze {
     
     public int getMazeInfo() {
         return rows;
+    }
+    public void setSolutionTarget(int row, int col) {
+        this.solutionTarget = cells[row][col];
+    }
+    public void setStartCell(int row, int col) {
+        this.startCell = cells[row][col];
+        // Opcionalmente, puedes reiniciar el laberinto o actualizar cualquier estado relevante aquí
     }
 
     public Maze(int rows, int cols) {
@@ -173,8 +184,10 @@ public class Maze {
     
      public Stack<Cell> solveMaze() {
         Stack<Cell> path = new Stack<>();
-    Cell start = cells[0][0]; // Punto de inicio es la celda superior izquierda
-    Cell end = cells[rows - 1][cols - 1]; // Punto final es la celda inferior derecha
+    //Cell start = cells[0][0]; // Punto de inicio es la celda superior izquierda
+    Cell start = startCell != null ? startCell : cells[0][0];
+    //Cell end = cells[rows - 1][cols - 1]; // Punto final es la celda inferior derecha
+    Cell end = solutionTarget != null ? solutionTarget : cells[rows - 1][cols - 1]; // Usar el objetivo si está establecido
 
     // Si el punto de inicio o final es una pared, no hay solución.
     if (start.hasAllWalls() || end.hasAllWalls()) {
