@@ -34,6 +34,7 @@ public class MainFrame extends JFrame {
   
   
     private JButton loadMapButton; // Botón para cargar laberintos
+    
  
    
   
@@ -47,22 +48,8 @@ public class MainFrame extends JFrame {
         cells = new Cell[numRows][numCols];
 
       
-        loadMapButton = new JButton("Cargar Laberinto");
-        loadMapButton.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setDialogTitle("Seleccionar archivo del laberinto");
-            FileNameExtensionFilter filter = new FileNameExtensionFilter("Archivos XML", "xml");
-            fileChooser.setFileFilter(filter);
+       
 
-            int result = fileChooser.showOpenDialog(MainFrame.this);
-            if (result == JFileChooser.APPROVE_OPTION) {
-                File selectedFile = fileChooser.getSelectedFile();
-                loadMazeFromFile(selectedFile.getAbsolutePath());
-            }
-        }
-    });
         
         generateMazeButton = new JButton("Generar laberinto");
         generateMazeButton.addActionListener(new ActionListener() {
@@ -88,7 +75,41 @@ public class MainFrame extends JFrame {
                //generateMaze();
             }
         });
-        
+        loadMapButton = new JButton("Cargar laberinto");
+        loadMapButton.addActionListener(new ActionListener() {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Seleccionar Archivo de Laberinto");
+        int result = fileChooser.showOpenDialog(null);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            try {
+                // Leer las dimensiones del laberinto desde el archivo XML
+                DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+                Document doc = dBuilder.parse(selectedFile);
+                doc.getDocumentElement().normalize();
+                
+                int rows = Integer.parseInt(doc.getDocumentElement().getAttribute("rows"));
+                int cols = Integer.parseInt(doc.getDocumentElement().getAttribute("cols"));
+
+                // Crear la instancia de Maze con las dimensiones leídas
+                Maze maze = new Maze(rows, cols);
+                maze.loadMazeFromXml(selectedFile.getAbsolutePath());
+                
+                // Mostrar el laberinto en una nueva ventana
+                MazeWindow mazeWindow = new MazeWindow(maze);
+                mazeWindow.setVisible(true);
+                openMazes.add(mazeWindow);
+                updateMazeInfo();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Error al cargar el laberinto: " + ex.getMessage());
+            }
+        }
+    }
+});
        
         mazeInfoTextArea = new JTextArea(10, 30);
         mazeInfoTextArea.setEditable(false);
@@ -133,53 +154,6 @@ public class MainFrame extends JFrame {
         openMazes.add(mazeWindow);
         updateMazeInfo();
     }
-    
-    
-    private void loadMazeFromFile(String filePath) {
-        try {
-            File xmlFile = new File(filePath);
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(xmlFile);
-            doc.getDocumentElement().normalize();
-
-            NodeList cellList = doc.getElementsByTagName("cell");
-
-            for (int i = 0; i < cellList.getLength(); i++) {
-                Node node = cellList.item(i);
-                if (node.getNodeType() == Node.ELEMENT_NODE) {
-                    Element element = (Element) node;
-                    int row = Integer.parseInt(element.getAttribute("row"));
-                    int col = Integer.parseInt(element.getAttribute("col"));
-
-                    // Asegúrate de que las coordenadas estén dentro de los límites de la matriz
-                    if (row >= 0 && row < cells.length && col >= 0 && col < cells[0].length) {
-                        boolean topWall = Boolean.parseBoolean(element.getAttribute("topWall"));
-                        boolean leftWall = Boolean.parseBoolean(element.getAttribute("leftWall"));
-                        boolean bottomWall = Boolean.parseBoolean(element.getAttribute("bottomWall"));
-                        boolean rightWall = Boolean.parseBoolean(element.getAttribute("rightWall"));
-
-                        // Crea la celda y configura sus propiedades
-                        Cell cell = new Cell(row,col);
-                        cell.setTopWall(topWall);
-                        cell.setLeftWall(leftWall);
-                        cell.setBottomWall(bottomWall);
-                        cell.setRightWall(rightWall);
-
-                        // Asigna la celda a la matriz
-                        cells[row][col] = cell;
-                    }
-                }
-            }
-
-            // Realiza cualquier otra actualización o redibujado necesario aquí
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error al cargar el laberinto desde el archivo XML: " + e.getMessage(), "Error de Carga", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
     
     
     
