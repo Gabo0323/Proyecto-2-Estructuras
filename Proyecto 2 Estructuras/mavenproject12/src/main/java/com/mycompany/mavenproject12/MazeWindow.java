@@ -62,7 +62,7 @@ public class MazeWindow extends JFrame {
               }
           }
       });
-      navigateMazeButton = new JButton("Navigate Maze");
+      navigateMazeButton = new JButton("Recorrer laberinto");
       navigateMazeButton.addActionListener(new ActionListener() {
           @Override
           public void actionPerformed(ActionEvent e) {
@@ -74,8 +74,16 @@ public class MazeWindow extends JFrame {
               }
           }
       });
+      JButton selectSolutionButton = new JButton("Select FINAL del laberinto");
+selectSolutionButton.addActionListener(new ActionListener() {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        mazePanel.enableTargetSelection(true); // Habilitar modo de selección en MazePanel
+    }
+});
+
       
-      JButton switchViewButton = new JButton("Switch View");
+      JButton switchViewButton = new JButton("Cambiar vista");
         switchViewButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -96,6 +104,13 @@ public class MazeWindow extends JFrame {
               mazePanel.setShowSolution(showSolution); // Actualiza el panel con el nuevo estado
           }
       });
+      JButton selectStartButton = new JButton("Seleccione INICIO");
+selectStartButton.addActionListener(new ActionListener() {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        mazePanel.enableStartSelection(true); // Habilitar modo de selección de inicio en MazePanel
+    }
+});
 
       // Añadir el botón de guardar a la ventana
       JPanel buttonPanel = new JPanel(); // Puedes utilizar un JPanel para ordenar tus botones
@@ -104,6 +119,8 @@ public class MazeWindow extends JFrame {
       //buttonPanel.add(navigateMazeButton);
       buttonPanel.add(navigateMazeButton);
        buttonPanel.add(switchViewButton);
+       buttonPanel.add(selectSolutionButton);
+       buttonPanel.add(selectStartButton);
       this.getContentPane().add(buttonPanel, BorderLayout.SOUTH); // Añadir el botón en la parte sur del layout
 
       zoomInButton = new JButton("Zoom In");
