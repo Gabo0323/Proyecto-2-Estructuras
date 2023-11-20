@@ -1,11 +1,11 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.mavenproject12;
+
 /**
- *
- * @author esteb
+ * Clase principal que representa el marco de la aplicación de generación y
+ * carga de laberintos. Extiende JFrame e implementa la lógica de generación y
+ * carga de laberintos. También realiza un seguimiento de las ventanas de
+ * laberintos abiertas. Permite generar laberintos aleatorios y cargar
+ * laberintos desde archivos XML.
  */
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -25,92 +25,79 @@ import org.w3c.dom.NodeList;
 import java.awt.BorderLayout;
 
 public class MainFrame extends JFrame {
+
     private JButton generateMazeButton;
     private JTextArea mazeInfoTextArea;
     private ArrayList<MazeWindow> openMazes;
     private Cell[][] cells;
-    
-  
-  
-  
+
     private JButton loadMapButton; // Botón para cargar laberintos
-    
- 
-   
-  
 
     public MainFrame() {
-       
+
         super("Generador de Laberintos");
         openMazes = new ArrayList<>();
-        int numRows = 10; // Cambia el tamaño según tus necesidades
-        int numCols = 10; // Cambia el tamaño según tus necesidades
+        int numRows = 10; // Numero de filas
+        int numCols = 10; // Numero de columnas
         cells = new Cell[numRows][numCols];
 
-      
-       
-
-        
         generateMazeButton = new JButton("Generar laberinto");
         generateMazeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Random rand = new Random();
                 int minSize = 5;
-                int maxSize = 20; // Asegúrate de que maxSize sea mayor que minSize
+                int maxSize = 20; //tamaño maximo
                 int width = rand.nextInt((maxSize - minSize) + 1) + minSize;
                 int height = rand.nextInt((maxSize - minSize) + 1) + minSize;
-                
-                Maze maze = new Maze(width, height); // Aquí defines el tamaño del laberinto
-                maze.generateMazePRIM(); // Generar el laberintof
-                
 
+                Maze maze = new Maze(width, height); // tamaño del laberinto
+                maze.generateMazePRIM(); // Generar el laberinto
 
-        // Crear una nueva ventana de laberinto y pasarle la instancia del laberinto
-        MazeWindow mazeWindow = new MazeWindow(maze);
-        mazeWindow.setVisible(true); // Mostrar la ventan
-        openMazes.add(mazeWindow);
-        updateMazeInfo();
-               
-               //generateMaze();
+                // Crear una nueva ventana de laberinto y pasarle la instancia del laberinto
+                MazeWindow mazeWindow = new MazeWindow(maze);
+                mazeWindow.setVisible(true); // Mostrar la ventan
+                openMazes.add(mazeWindow);
+                updateMazeInfo();
+
             }
         });
         loadMapButton = new JButton("Cargar laberinto");
         loadMapButton.addActionListener(new ActionListener() {
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Seleccionar Archivo de Laberinto");
-        int result = fileChooser.showOpenDialog(null);
-        if (result == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = fileChooser.getSelectedFile();
-            try {
-                // Leer las dimensiones del laberinto desde el archivo XML
-                DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-                DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-                Document doc = dBuilder.parse(selectedFile);
-                doc.getDocumentElement().normalize();
-                
-                int rows = Integer.parseInt(doc.getDocumentElement().getAttribute("rows"));
-                int cols = Integer.parseInt(doc.getDocumentElement().getAttribute("cols"));
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("Seleccionar Archivo de Laberinto");
+                int result = fileChooser.showOpenDialog(null);
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    File selectedFile = fileChooser.getSelectedFile();
+                    try {
+                        // Leer las dimensiones del laberinto desde el archivo XML
+                        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+                        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+                        Document doc = dBuilder.parse(selectedFile);
+                        doc.getDocumentElement().normalize();
 
-                // Crear la instancia de Maze con las dimensiones leídas
-                Maze maze = new Maze(rows, cols);
-                maze.loadMazeFromXml(selectedFile.getAbsolutePath());
-                
-                // Mostrar el laberinto en una nueva ventana
-                MazeWindow mazeWindow = new MazeWindow(maze);
-                mazeWindow.setVisible(true);
-                openMazes.add(mazeWindow);
-                updateMazeInfo();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(null, "Error al cargar el laberinto: " + ex.getMessage());
+                        int rows = Integer.parseInt(doc.getDocumentElement().getAttribute("rows"));
+                        int cols = Integer.parseInt(doc.getDocumentElement().getAttribute("cols"));
+
+                        // Crear la instancia de Maze con las dimensiones leídas
+                        Maze maze = new Maze(rows, cols);
+                        maze.loadMazeFromXml(selectedFile.getAbsolutePath());
+
+                        // Mostrar el laberinto en una nueva ventana
+                        MazeWindow mazeWindow = new MazeWindow(maze);
+                        mazeWindow.setVisible(true);
+                        openMazes.add(mazeWindow);
+                        updateMazeInfo();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(null, "Error al cargar el laberinto: " + ex.getMessage());
+                    }
+                }
             }
-        }
-    }
-});
-       
+        });
+
         mazeInfoTextArea = new JTextArea(10, 30);
         mazeInfoTextArea.setEditable(false);
 
@@ -124,42 +111,35 @@ public class MainFrame extends JFrame {
     }
 
     private void updateMazeInfo() {
-    StringBuilder infoBuilder = new StringBuilder();
-    int contador = 0;
-    for (MazeWindow mazeWindow : openMazes) {
-        Maze maze = mazeWindow.getMaze(); // Asumiendo que tienes un método para obtener el Maze desde MazeWindow
-        int numRows = maze.getRows();
-        int numCols = maze.getCols();
-        
-        infoBuilder.append("Laberinto ").append(contador + 1).append(": ")
-                   .append(numRows).append(" filas x ")
-                   .append(numCols).append(" columnas\n");
-        contador++;
+        StringBuilder infoBuilder = new StringBuilder();
+        int contador = 0;
+        for (MazeWindow mazeWindow : openMazes) {
+            Maze maze = mazeWindow.getMaze();
+            int numRows = maze.getRows();
+            int numCols = maze.getCols();
+
+            infoBuilder.append("Laberinto ").append(contador + 1).append(": ")
+                    .append(numRows).append(" filas x ")
+                    .append(numCols).append(" columnas\n");
+            contador++;
+        }
+        mazeInfoTextArea.setText(infoBuilder.toString());
+        System.out.println("Total de laberintos abiertos: " + contador);
     }
-    mazeInfoTextArea.setText(infoBuilder.toString());
-    System.out.println("Total de laberintos abiertos: " + contador);
-}
-   
+
     private void updateCellSize() {
         // Actualizar la lógica del tamaño de las celdas si es necesario
         int panelWidth = getWidth();
         int panelHeight = getHeight();
-        //cellSize = Math.min(panelWidth / maze.getCols(), panelHeight / maze.getRows());
     }
-    
+
     private void generateMaze() {
-        Maze maze = new Maze(6,6);
+        Maze maze = new Maze(6, 6);
         MazeWindow mazeWindow = new MazeWindow(maze);
-         
+
         openMazes.add(mazeWindow);
         updateMazeInfo();
     }
-    
-    
-    
-    
-  
-    
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new MainFrame());

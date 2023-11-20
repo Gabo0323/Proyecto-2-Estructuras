@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.mavenproject12;
 
 import java.awt.Color;
@@ -17,94 +13,97 @@ import java.awt.BasicStroke;
 import java.awt.FontMetrics;
 import java.awt.Font;
 
+/*
+ * Clase MazePanel que dibuja la interfaz grafica de los laverintos
+ */
 public class MazePanel extends JPanel {
 
     private Maze maze;
-    // private boolean showSolution = true;
     private boolean showSolution;
     private Cell currentCell;
     private boolean navigable = false;
-     private boolean usePaintComponent2 = false;
-      private boolean startSelectionMode = false;
+    private boolean usePaintComponent2 = false;
+    private boolean startSelectionMode = false;
 
     private double scale = 1.0;
 
+    // Constructor de la clase MazePanel
     public MazePanel(Maze maze) {
         this.maze = maze;
 
-        this.currentCell = maze.getCells()[0][0]; // o cualquier celda de inicio que desees
+        this.currentCell = maze.getCells()[0][0]; // celda de inicio
 
     }
 
+    // Selecciona cuando mostrar la solucion
     public void setShowSolution(boolean show) {
         showSolution = show;
-        repaint(); // Esto asegura que el panel se redibuje con la solución visible o no
+        repaint(); // Redibuja el panel
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        if(usePaintComponent2){
+        if (usePaintComponent2) {
             paintComponent2(g);
-        }
-        else{
+        } else {
             Graphics2D g2 = (Graphics2D) g;
-        int w = getWidth();
-        int h = getHeight();
-        g2.translate(w / 2, h / 2);
-        g2.scale(scale, scale);
-        g2.translate(-w / 2, -h / 2);
+            int w = getWidth();
+            int h = getHeight();
+            g2.translate(w / 2, h / 2);
+            g2.scale(scale, scale);
+            g2.translate(-w / 2, -h / 2);
 
-        super.paintComponent(g);
-        System.out.println("prueba del repaint");
-        int panelWidth = getWidth();
-        int panelHeight = getHeight();
-        int cellWidth = panelWidth / maze.getCols();
-        int cellHeight = panelHeight / maze.getRows();
-        int cellSize = Math.min(cellWidth, cellHeight);
-        // Draw the maze
-        Cell[][] cells = maze.getCells();
-        // cellSize = 20; // Adjust as needed
-        for (int r = 0; r < cells.length; r++) {
-            for (int c = 0; c < cells[r].length; c++) {
-                Cell cell = cells[r][c];
-                int x = c * cellSize;
-                int y = r * cellSize;
-                if (cell.hasTopWall()) {
-                    g.drawLine(x, y, x + cellSize, y);
-                }
-                if (cell.hasLeftWall()) {
-                    g.drawLine(x, y, x, y + cellSize);
-                }
-                if (cell.hasBottomWall()) {
-                    g.drawLine(x, y + cellSize, x + cellSize, y + cellSize);
-                }
-                if (cell.hasRightWall()) {
-                    g.drawLine(x + cellSize, y, x + cellSize, y + cellSize);
+            super.paintComponent(g);
+            System.out.println("prueba del repaint");
+            int panelWidth = getWidth();
+            int panelHeight = getHeight();
+            int cellWidth = panelWidth / maze.getCols();
+            int cellHeight = panelHeight / maze.getRows();
+            int cellSize = Math.min(cellWidth, cellHeight);
+            // Dibuja las paredes del laberinto
+            Cell[][] cells = maze.getCells();
+
+            for (int r = 0; r < cells.length; r++) {
+                for (int c = 0; c < cells[r].length; c++) {
+                    Cell cell = cells[r][c];
+                    int x = c * cellSize;
+                    int y = r * cellSize;
+                    if (cell.hasTopWall()) {
+                        g.drawLine(x, y, x + cellSize, y);
+                    }
+                    if (cell.hasLeftWall()) {
+                        g.drawLine(x, y, x, y + cellSize);
+                    }
+                    if (cell.hasBottomWall()) {
+                        g.drawLine(x, y + cellSize, x + cellSize, y + cellSize);
+                    }
+                    if (cell.hasRightWall()) {
+                        g.drawLine(x + cellSize, y, x + cellSize, y + cellSize);
+                    }
                 }
             }
-        }
 
-        if (showSolution) {
-            System.out.println("Estamos en el SHOW SOLUTION");
-            // Si la variable showSolution es verdadera, dibuja la solución
-            //Stack<Cell> solution = maze.solveMaze();
-            maze.resetVisited();
-            
-            Stack<Cell> solution = maze.solveMaze();
-            
-            Cell firstCell = solution.peek(); // La primera celda
+            if (showSolution) {
+                System.out.println("Estamos en el SHOW SOLUTION");
+                // Si la variable showSolution es verdadera, dibuja la solución
+
+                maze.resetVisited();
+
+                Stack<Cell> solution = maze.solveMaze();
+
+                Cell firstCell = solution.peek(); // La primera celda
                 Cell lastCell = solution.lastElement(); // La última celda
-            g.setColor(Color.BLACK); // Elige el color para la solución
+                g.setColor(Color.BLACK); // Elige el color para la solución
 
-            for (Cell cell : solution) {
-                System.out.println("Dibujando EN EL FOR  DE la solución");
-                int x = cell.getCol() * cellSize + cellSize / 2;
-                int y = cell.getRow() * cellSize + cellSize / 2;
-                int ovalSize = Math.max(1, cellSize / 4); // Ajusta el tamaño del círculo
-                g.fillOval(x - ovalSize / 2, y - ovalSize / 2, ovalSize, ovalSize);
-                
-                 if (cell.equals(firstCell)) {
+                for (Cell cell : solution) {
+                    System.out.println("Dibujando EN EL FOR  DE la solución");
+                    int x = cell.getCol() * cellSize + cellSize / 2;
+                    int y = cell.getRow() * cellSize + cellSize / 2;
+                    int ovalSize = Math.max(1, cellSize / 4); // Ajusta el tamaño del círculo
+                    g.fillOval(x - ovalSize / 2, y - ovalSize / 2, ovalSize, ovalSize);
+
+                    if (cell.equals(firstCell)) {
                         g.setColor(Color.BLUE); // Color para la primera celda
                     } else if (cell.equals(lastCell)) {
                         g.setColor(Color.GREEN); // Color para la última celda
@@ -114,100 +113,82 @@ public class MazePanel extends JPanel {
 
                     g.fillOval(x - ovalSize / 2, y - ovalSize / 2, ovalSize, ovalSize);
 
-                //System.out.println("x:" + x);
-                //System.out.println("y:" + y);
+                }
 
+            } else {
+                System.out.println("NOOO Dibujando la solución");
             }
-            //Cell start = solution.get(0); // Asumiendo que la solución comienza con la celda inicial.
-            //dibujarPuntoEspecial(g, start, Color.GREEN);       
 
-        } else {
-            System.out.println("NOOO Dibujando la solución");
-        }
-        /*
-    if (!currentSolutionSteps.isEmpty()) {
-        g.setColor(Color.RED);
-        for (Cell cell : currentSolutionSteps) {
-            // Dibuja cada paso de la solución
-            int x = cell.getCol() * cellSize + cellSize / 2;
-            int y = cell.getRow() * cellSize + cellSize / 2;
-            int ovalSize = Math.max(1, cellSize / 4);
-            g.fillOval(x - ovalSize / 2, y - ovalSize / 2, ovalSize, ovalSize);
-        }
-    }*/
-        if (navigable && currentCell != null) {
+            if (navigable && currentCell != null) {
 
-            // Calcula las coordenadas del centro de la celda actual
-            int x = currentCell.getCol() * cellSize + cellSize / 2;
-            int y = currentCell.getRow() * cellSize + cellSize / 2;
-            int ovalSize = Math.max(1, cellSize / 4); // Ajusta el tamaño del círculo si es necesario
+                // Calcula las coordenadas del centro de la celda actual
+                int x = currentCell.getCol() * cellSize + cellSize / 2;
+                int y = currentCell.getRow() * cellSize + cellSize / 2;
+                int ovalSize = Math.max(1, cellSize / 4); // Ajusta el tamaño del círculo si es necesario
 
-            g.setColor(Color.RED);
-            g.fillOval(x - ovalSize / 2, y - ovalSize / 2, ovalSize, ovalSize);
-        }
-        
-        
-        if (currentCell.equals(maze.getCells()[maze.getRows() - 1][maze.getCols() - 1])) {
-            String message = "¡Felicidades, has completado el laberinto!";
-            g.setColor(Color.GREEN);
-            g.setFont(new Font("Arial", Font.BOLD, 20));
+                g.setColor(Color.RED);
+                g.fillOval(x - ovalSize / 2, y - ovalSize / 2, ovalSize, ovalSize);
+            }
 
-            FontMetrics metrics = g.getFontMetrics();
-            int x = (getWidth() - metrics.stringWidth(message)) / 2;
-            int y = ((getHeight() - metrics.getHeight()) / 2) + metrics.getAscent();
+            if (currentCell.equals(maze.getCells()[maze.getRows() - 1][maze.getCols() - 1])) {
+                String message = "¡Felicidades, has completado el laberinto!";
+                g.setColor(Color.GREEN);
+                g.setFont(new Font("Arial", Font.BOLD, 20));
 
-            g.drawString(message, x, y);
-        }
+                FontMetrics metrics = g.getFontMetrics();
+                int x = (getWidth() - metrics.stringWidth(message)) / 2;
+                int y = ((getHeight() - metrics.getHeight()) / 2) + metrics.getAscent();
+
+                g.drawString(message, x, y);
+            }
         }
     }
-    
-    
-    
+
     protected void paintComponent2(Graphics g) {
-    super.paintComponent(g);
-    Graphics2D g2 = (Graphics2D) g;
-    int w = getWidth();
-    int h = getHeight();
-    g2.translate(w / 2, h / 2);
-    g2.scale(scale, scale);
-    g2.translate(-w / 2, -h / 2);
+        super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D) g;
+        int w = getWidth();
+        int h = getHeight();
+        g2.translate(w / 2, h / 2);
+        g2.scale(scale, scale);
+        g2.translate(-w / 2, -h / 2);
 
-    // Configuración del color y grosor de las paredes del laberinto
-    g2.setColor(Color.ORANGE); // Color naranja para las paredes
-    float thickness = 3.0f; // Grosor de las paredes
-    g2.setStroke(new BasicStroke(thickness));
+        // Configuración del color y grosor de las paredes del laberinto
+        g2.setColor(Color.ORANGE); // Color naranja para las paredes
+        float thickness = 3.0f; // Grosor de las paredes
+        g2.setStroke(new BasicStroke(thickness));
 
-    int panelWidth = getWidth();
-    int panelHeight = getHeight();
-    int cellWidth = panelWidth / maze.getCols();
-    int cellHeight = panelHeight / maze.getRows();
-    int cellSize = Math.min(cellWidth, cellHeight);
+        int panelWidth = getWidth();
+        int panelHeight = getHeight();
+        int cellWidth = panelWidth / maze.getCols();
+        int cellHeight = panelHeight / maze.getRows();
+        int cellSize = Math.min(cellWidth, cellHeight);
 
-    // Draw the maze
-    Cell[][] cells = maze.getCells();
-    for (int r = 0; r < cells.length; r++) {
-        for (int c = 0; c < cells[r].length; c++) {
-            Cell cell = cells[r][c];
-            int x = c * cellSize;
-            int y = r * cellSize;
-            if (cell.hasTopWall()) {
-                g2.drawLine(x, y, x + cellSize, y);
-            }
-            if (cell.hasLeftWall()) {
-                g2.drawLine(x, y, x, y + cellSize);
-            }
-            if (cell.hasBottomWall()) {
-                g2.drawLine(x, y + cellSize, x + cellSize, y + cellSize);
-            }
-            if (cell.hasRightWall()) {
-                g2.drawLine(x + cellSize, y, x + cellSize, y + cellSize);
+        // Dibuja el laberinto
+        Cell[][] cells = maze.getCells();
+        for (int r = 0; r < cells.length; r++) {
+            for (int c = 0; c < cells[r].length; c++) {
+                Cell cell = cells[r][c];
+                int x = c * cellSize;
+                int y = r * cellSize;
+                if (cell.hasTopWall()) {
+                    g2.drawLine(x, y, x + cellSize, y);
+                }
+                if (cell.hasLeftWall()) {
+                    g2.drawLine(x, y, x, y + cellSize);
+                }
+                if (cell.hasBottomWall()) {
+                    g2.drawLine(x, y + cellSize, x + cellSize, y + cellSize);
+                }
+                if (cell.hasRightWall()) {
+                    g2.drawLine(x + cellSize, y, x + cellSize, y + cellSize);
+                }
             }
         }
-    }
-    if (showSolution) {
+        if (showSolution) {
             System.out.println("Estamos en el SHOW SOLUTION");
             // Si la variable showSolution es verdadera, dibuja la solución
-            //Stack<Cell> solution = maze.solveMaze();
+
             maze.resetVisited();
             Stack<Cell> solution = maze.solveMaze();
             g.setColor(Color.BLACK); // Elige el color para la solución
@@ -223,23 +204,11 @@ public class MazePanel extends JPanel {
                 System.out.println("y:" + y);
 
             }
-            //Cell start = solution.get(0); // Asumiendo que la solución comienza con la celda inicial.
-            //dibujarPuntoEspecial(g, start, Color.GREEN);       
 
         } else {
             System.out.println("NOOO Dibujando la solución");
         }
-        /*
-    if (!currentSolutionSteps.isEmpty()) {
-        g.setColor(Color.RED);
-        for (Cell cell : currentSolutionSteps) {
-            // Dibuja cada paso de la solución
-            int x = cell.getCol() * cellSize + cellSize / 2;
-            int y = cell.getRow() * cellSize + cellSize / 2;
-            int ovalSize = Math.max(1, cellSize / 4);
-            g.fillOval(x - ovalSize / 2, y - ovalSize / 2, ovalSize, ovalSize);
-        }
-    }*/
+
         if (navigable && currentCell != null) {
 
             // Calcula las coordenadas del centro de la celda actual
@@ -250,9 +219,7 @@ public class MazePanel extends JPanel {
             g.setColor(Color.RED);
             g.fillOval(x - ovalSize / 2, y - ovalSize / 2, ovalSize, ovalSize);
         }
-        
-        
-        
+
         if (currentCell.equals(maze.getCells()[maze.getRows() - 1][maze.getCols() - 1])) {
             String message = "¡Felicidades, has completado el laberinto!";
             g.setColor(Color.GREEN);
@@ -265,8 +232,7 @@ public class MazePanel extends JPanel {
             g.drawString(message, x, y);
         }
 
-    // El resto del código permanece igual...
-}
+    }
 
     @Override
     public Dimension getPreferredSize() {
@@ -274,24 +240,25 @@ public class MazePanel extends JPanel {
         int h = maze.getRows() * 10;
         return new Dimension((int) (w * scale), (int) (h * scale));
     }
-    
-    public double getScale() {
-       return scale;
-   }
-   public void setScale(double scale) {
-       this.scale = scale;
-       revalidate();
-       repaint();
-   }
-   
-   public void setUsePaintComponent2(boolean use) {
-    usePaintComponent2 = use;
-    repaint();
-}
 
-public boolean isUsingPaintComponent2() {
-    return usePaintComponent2;
-}
+    public double getScale() {
+        return scale;
+    }
+
+    public void setScale(double scale) {
+        this.scale = scale;
+        revalidate();
+        repaint();
+    }
+
+    public void setUsePaintComponent2(boolean use) {
+        usePaintComponent2 = use;
+        repaint();
+    }
+
+    public boolean isUsingPaintComponent2() {
+        return usePaintComponent2;
+    }
 
     public void setNavigable(boolean navigable) {
         this.navigable = navigable;
@@ -319,7 +286,7 @@ public boolean isUsingPaintComponent2() {
                         case KeyEvent.VK_RIGHT:
                             newCol++;
                             break;
-                        // puedes agregar más casos si necesitas otras teclas
+
                     }
 
                     if (canMoveToCell(newRow, newCol)) {
@@ -374,7 +341,7 @@ public boolean isUsingPaintComponent2() {
             });
         }
     }
-    
+
     public void enableStartSelection(boolean enable) {
         this.startSelectionMode = enable;
         if (enable) {
@@ -389,49 +356,49 @@ public boolean isUsingPaintComponent2() {
             });
         }
     }
-    
+
     private void selectTargetCell(int x, int y) {
-    // Ajustar las coordenadas del ratón para tener en cuenta la transformación y escala
-    int w = getWidth();
-    int h = getHeight();
-    int adjustedX = (int) ((x - w / 2) / scale + w / 2);
-    int adjustedY = (int) ((y - h / 2) / scale + h / 2);
+        // Ajustar las coordenadas del ratón para tener en cuenta la transformación y escala
+        int w = getWidth();
+        int h = getHeight();
+        int adjustedX = (int) ((x - w / 2) / scale + w / 2);
+        int adjustedY = (int) ((y - h / 2) / scale + h / 2);
 
-    // Calcular el tamaño de las celdas basado en el tamaño actual del panel
-    int cellSize = Math.min(getWidth() / maze.getCols(), getHeight() / maze.getRows());
+        // Calcular el tamaño de las celdas basado en el tamaño actual del panel
+        int cellSize = Math.min(getWidth() / maze.getCols(), getHeight() / maze.getRows());
 
-    // Convertir coordenadas de pantalla a coordenadas de celda
-    int col = adjustedX / cellSize;
-    int row = adjustedY / cellSize;
+        // Convertir coordenadas de pantalla a coordenadas de celda
+        int col = adjustedX / cellSize;
+        int row = adjustedY / cellSize;
 
-    // Comprobar si las coordenadas están dentro de los límites del laberinto
-    if (row >= 0 && row < maze.getRows() && col >= 0 && col < maze.getCols()) {
-        // Establecer la celda seleccionada como objetivo en Maze
-        maze.setSolutionTarget(row, col);
-        repaint(); // Repintar para mostrar la solución desde la nueva celda objetivo
+        // Comprobar si las coordenadas están dentro de los límites del laberinto
+        if (row >= 0 && row < maze.getRows() && col >= 0 && col < maze.getCols()) {
+            // Establecer la celda seleccionada como objetivo en Maze
+            maze.setSolutionTarget(row, col);
+            repaint(); // Repintar para mostrar la solución desde la nueva celda objetivo
+        }
     }
-}
+
     private void selectStartCell(int x, int y) {
-    // Ajustar las coordenadas del ratón para tener en cuenta la transformación y escala
-    int w = getWidth();
-    int h = getHeight();
-    int adjustedX = (int) ((x - w / 2) / scale + w / 2);
-    int adjustedY = (int) ((y - h / 2) / scale + h / 2);
+        // Ajustar las coordenadas del ratón para tener en cuenta la transformación y escala
+        int w = getWidth();
+        int h = getHeight();
+        int adjustedX = (int) ((x - w / 2) / scale + w / 2);
+        int adjustedY = (int) ((y - h / 2) / scale + h / 2);
 
-    // Calcular el tamaño de las celdas basado en el tamaño actual del panel
-    int cellSize = Math.min(getWidth() / maze.getCols(), getHeight() / maze.getRows());
+        // Calcular el tamaño de las celdas basado en el tamaño actual del panel
+        int cellSize = Math.min(getWidth() / maze.getCols(), getHeight() / maze.getRows());
 
-    // Convertir coordenadas de pantalla a coordenadas de celda
-    int col = adjustedX / cellSize;
-    int row = adjustedY / cellSize;
+        // Convertir coordenadas de pantalla a coordenadas de celda
+        int col = adjustedX / cellSize;
+        int row = adjustedY / cellSize;
 
-    // Comprobar si las coordenadas están dentro de los límites del laberinto
-    if (row >= 0 && row < maze.getRows() && col >= 0 && col < maze.getCols()) {
-        // Establecer la celda seleccionada como inicio en Maze
-        maze.setStartCell(row, col);
-        repaint(); // Repintar para mostrar cualquier cambio en la pantalla
+        // Comprobar si las coordenadas están dentro de los límites del laberinto
+        if (row >= 0 && row < maze.getRows() && col >= 0 && col < maze.getCols()) {
+            // Establecer la celda seleccionada como inicio en Maze
+            maze.setStartCell(row, col);
+            repaint(); // Repintar para mostrar cualquier cambio en la pantalla
+        }
     }
-}
 
 }
-

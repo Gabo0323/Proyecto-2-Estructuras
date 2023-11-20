@@ -1,15 +1,12 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.mavenproject12;
 
 /**
- *
- * @author esteb
+ * Representa una celda en un laberinto. Cada celda tiene coordenadas (fila,
+ * columna) y puede tener paredes en las cuatro direcciones. También se utiliza
+ * para rastrear si la celda ha sido visitada durante la generación o resolución
+ * del laberinto. Además, se puede utilizar para seguir el camino en la
+ * resolución del laberinto.
  */
-
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +15,7 @@ import java.util.List;
  * @author esteb
  */
 public class Cell {
+
     private final int row;
     private final int col;
     private boolean isInMaze;
@@ -25,7 +23,7 @@ public class Cell {
     private boolean leftWall;
     private boolean bottomWall;
     private boolean rightWall;
-    
+
     private boolean visited;
 
     public Cell(int row, int col) {
@@ -36,9 +34,10 @@ public class Cell {
         leftWall = true;
         bottomWall = true;
         rightWall = true;
-        
+
         visited = false;
     }
+// Rompe la pared entre la celda actual y otra celda
 
     public void breakWall(Cell other) {
         if (row < other.row) {
@@ -55,27 +54,26 @@ public class Cell {
             other.rightWall = false;
         }
     }
-    
-    
-    
+
+    // Setter para las paredes
     public void setTopWall(boolean topWall) {
-    this.topWall = topWall;
-}
-    
+        this.topWall = topWall;
+    }
+
     public void setBottomWall(boolean bottomWall) {
-    this.bottomWall = bottomWall;
-}
-    
+        this.bottomWall = bottomWall;
+    }
+
     public void setLeftWall(boolean leftWall) {
-    this.leftWall = leftWall;
-}
-    
+        this.leftWall = leftWall;
+    }
+
     public void setRightWall(boolean rightWall) {
-    this.rightWall = rightWall;
-}
-    
-    
-     public boolean isVisited() {
+        this.rightWall = rightWall;
+    }
+
+    // Getter y Setter para la marca de visita
+    public boolean isVisited() {
         return visited;
     }
 
@@ -83,10 +81,12 @@ public class Cell {
         this.visited = visited;
     }
 
-    
+    // Verifica si la celda tiene todas las paredes
     public boolean hasAllWalls() {
-    return topWall && leftWall && bottomWall && rightWall;
-}
+        return topWall && leftWall && bottomWall && rightWall;
+    }
+
+    // Obtiene un vecino no visitado de la celda
     public Cell getUnvisitedNeighbour(Cell[][] cells) {
         List<Cell> neighbours = getNeighbours(cells);
         for (Cell neighbour : neighbours) {
@@ -97,6 +97,7 @@ public class Cell {
         return null;
     }
 
+    // Verifica si hay una pared entre la celda actual y otra celda
     public boolean hasWallBetween(Cell other) {
         if (row == other.row) {
             if (col == other.col - 1) {
@@ -117,8 +118,8 @@ public class Cell {
         }
         return true; // Si las celdas no son vecinas, asumimos que hay una pared
     }
-    
-    
+
+    // Obtiene la lista de vecinos de la celda
     public List<Cell> getNeighbours(Cell[][] cells) {
         List<Cell> neighbours = new ArrayList<>();
 
@@ -141,7 +142,8 @@ public class Cell {
 
         return neighbours;
     }
-    
+
+    // Getters para las propiedades de la celda
     public int getRow() {
         return row;
     }
@@ -159,7 +161,6 @@ public class Cell {
     }
 
     // Getters for walls...
-
     public boolean hasTopWall() {
         return topWall;
     }
@@ -175,32 +176,30 @@ public class Cell {
     public boolean hasRightWall() {
         return rightWall;
     }
-    
+
     /////////////////////////////////////
-    
-    
+    // Propiedades adicionales para la resolución del laberinto
     private Cell parent;
 
-public Cell getParent() {
-    return parent;
-}
-
-public void setParent(Cell parent) {
-    this.parent = parent;
-}
-public List<Cell> getConnectedNeighbours(Cell[][] cells) {
-    List<Cell> connectedNeighbours = new ArrayList<>();
-    List<Cell> neighbours = getNeighbours(cells);
-    
-    for (Cell neighbour : neighbours) {
-        if (neighbour.isInMaze() && !this.hasWallBetween(neighbour)) {
-            connectedNeighbours.add(neighbour);
-        }
+    public Cell getParent() {
+        return parent;
     }
-    return connectedNeighbours;
-}
 
+    public void setParent(Cell parent) {
+        this.parent = parent;
+    }
+// Obtiene vecinos conectados en el laberinto
 
+    public List<Cell> getConnectedNeighbours(Cell[][] cells) {
+        List<Cell> connectedNeighbours = new ArrayList<>();
+        List<Cell> neighbours = getNeighbours(cells);
 
+        for (Cell neighbour : neighbours) {
+            if (neighbour.isInMaze() && !this.hasWallBetween(neighbour)) {
+                connectedNeighbours.add(neighbour);
+            }
+        }
+        return connectedNeighbours;
+    }
 
 }
